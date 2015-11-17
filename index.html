@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+
+    <title>Writing microservices with aiohttp</title>
+
+    <meta name="description" content="An introduction to the aiohttp ecosystem">
+    <meta name="author" content="Marco Mariani">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/night.css" id="theme">
+    <!--
+      <link rel="stylesheet" href="css/theme/black.css" id="theme">
+    -->
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="reveal">
+
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
+        <section>
+          <h1>aiohttp</h1>
+          <h4 class="fragment">aka Node.js for humans</h4>
+          <h3 class="fragment">starring Python 3</h3>
+          <p>
+            <small>Talk by <a href="mailto:marco.mariani@alterway.fr">Marco Mariani</a> - <a href="http://alterway.fr">R&D @ Alter Way</a></small>
+          </p>
+        </section>
+
+        <section>
+          <section>
+            <h3 style="text-transform:none">Why microservices...</h3>
+            <img style="background:white" width="700" data-src="./images/DecomposingApplications.021.jpg">
+            <small><a href="http://theartofscalability.com/">http://theartofscalability.com/</a></small>
+          </section>
+        </section>
+
+        <section>
+          <h2 style="text-transform:none">...because</h2>
+          <ul>
+            <li>Small, easy to understand code base</li>
+            <li class="fragment">Easy to scale</li>
+            <li class="fragment">Easy to throw away</li>
+            <li class="fragment">Easy to deploy</li>
+            <li class="fragment">Ability to change technology</li>
+            <li class="fragment">System resilience</li>
+            <li class="fragment">Better documentation, etc.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>less code → more architecture</h3>
+          <p>
+            <img style="background:white" height="500" data-src="./images/PatternsRelatedToMicroservices.jpg">
+          </p>
+          <small><a href="http://microservices.io/patterns/microservices.html">http://microservices.io/patterns/microservices.html</a></small>
+        </section>
+
+        <section>
+          <h3>tl;dr good</h3>
+          <img style="background:white" height="450" data-src="./images/microservices_architecture_diagram.png">
+          <small><a href="http://khoadinh.github.io/2015/05/01/microservices-architecture-overview.html">http://khoadinh.github.io/2015/05/01/microservices-architecture-overview.html</a></small>
+        </section>
+
+        <section>
+          <h3>less good</h5>
+          <p>
+            <img style="background:white" height="450" data-src="./images/440px-ESB.svg.png">
+          </p>
+          <small><a href="https://en.wikipedia.org/wiki/Enterprise_service_bus">https://en.wikipedia.org/wiki/Enterprise_service_bus</a></small>
+          <p>The entire system is tightly coupled, deployment is heavy</p>
+        </section>
+
+        <section>
+          <section>
+            <h4>The conventient monolith</h4>
+            <p>
+              <img style="background:white" height="400px" data-src="./images/trap.jpg">
+              <img style="background:white" height="400px" data-src="./images/3lyrs2.jpg">
+            </p>
+            <p>
+              If choices in the data layer are dictated by the upper layers or vice-versa, be careful.
+            </p>
+            <small><a href="http://malakarbhramar.blogspot.fr/2009/07/three-layer-achitecture-in-cnet.html">http://malakarbhramar.blogspot.fr/2009/07/three-layer-achitecture-in-cnet.html</a></small>
+          </section>
+          <section>
+            <h4>a taxonomy</h4>
+            <p>
+              <img style="background:white" height="400px" data-src="./images/full-stack.png">
+            </p>
+            <small><a href="https://codingarchitect.wordpress.com/2012/10/22/full-stack-frameworks-vs-non-full-stack-frameworks/">https://codingarchitect.wordpress.com/2012/10/22/full-stack-frameworks-vs-non-full-stack-frameworks/</a></small>
+          </section>
+        </section>
+
+        <section>
+          <h2>Frameworks, libraries</h2>
+          <h4>and tourist traps</h4>
+          <table>
+            <tbody>
+            <tr>
+              <td>
+                <ul class="fragment">
+                  <li>Aiohttp</li>
+                  <li>Aioweb</li>
+                  <li>Aspen</li>
+                  <li>Bobo</li>
+                  <li>Bottle</li>
+                  <li>CherryPy</li>
+                  <li>CubicWeb</li>
+                  <li>Django</li>
+                  <li>Eve</li>
+                  <li>Flask</li>
+                </ul>
+              </td>
+              <td>
+                <ul class="fragment">
+                  <li>Falcon</li>
+                  <li>Fresco</li>
+                  <li>Giotto</li>
+                  <li>Hug</li>
+                  <li>Itty</li>
+                  <li>Klein</li>
+                  <li>Milla</li>
+                  <li>Morepath</li>
+                  <li>Nacho</li>
+                  <li>Nevow</li>
+                </ul>
+              </td>
+              <td>
+                <ul class="fragment">
+                  <li>Nagare</li>
+                  <li>ObjectWeb</li>
+                  <li>Pyramid</li>
+                  <li>Pecan</li>
+                  <li>Pycnic</li>
+                  <li>Pump</li>
+                  <li>Rainfall</li>
+                  <li>Reahl</li>
+                  <li>Spanner</li>
+                  <li>Tornado</li>
+                </ul>
+              </td>
+              <td>
+                <ul class="fragment">
+                  <li>Twisted</li>
+                  <li>Turbogears</li>
+                  <li>Vase</li>
+                  <li>Web.py</li>
+                  <li>Web2py</li>
+                  <li>Werkzeug</li>
+                  <li>Wheezy&nbsp;Web</li>
+                  <li>Watson</li>
+                  <li>Webware</li>
+                  <li>Zope</li>
+                </ul>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <p>
+            <small class="fragment"><a href="http://bitworking.org/news/Why_so_many_Python_web_frameworks">http://bitworking.org/news/Why_so_many_Python_web_frameworks</a></small>
+          </p>
+        </section>
+
+        <section>
+          <h4>Common Mistakes as Python Web Developer</h4>
+          <p>
+            <img style="background:white" data-src="./images/spending-too-much-time.png">
+            </em>Armin Ronacher (author of Flask)</em>
+          </p>
+          <small><a href="http://lucumr.pocoo.org/2010/12/24/common-mistakes-as-web-developer/">http://lucumr.pocoo.org/2010/12/24/common-mistakes-as-web-developer/</a></small>
+        </section>
+
+        <section>
+          <h3>Why async?</h3>
+          <table>
+            <tbody>
+              <tr>
+                <td>
+                  <div>
+                    <img style="background:white" data-src="./images/blocks/sync.png">
+                    <p>sync&nbsp;(theory)</p>
+                  </div>
+                </td>
+                <td>
+                  <div class="fragment">
+                    <img style="background:white" height="360px" data-src="./images/blocks/block.png">
+                    <p>sync&nbsp;(real)</p>
+                  </div>
+                </td>
+                <td>
+                  <div class="fragment">
+                    <img style="background:white" height="160px" data-src="./images/blocks/threaded.png">
+                    <p>threaded</p>
+                  </div>
+                </td>
+                <td>
+                  <div class="fragment">
+                    <img style="background:white" height="360px" data-src="./images/blocks/async.png">
+                    <p>async</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <small><a href="http://krondo.com/wp-content/uploads/2009/08/twisted-intro.html">http://krondo.com/wp-content/uploads/2009/08/twisted-intro.html</a></small>
+        </section>
+
+        <section>
+          <img data-src="./images/wanted.png">
+        </section>
+
+        <section>
+          <h3 style="text-transform:none">import asyncio</h3>
+          <ul>
+            <li>
+              <a href="https://www.python.org/dev/peps/pep-3156/">PEP 3156</a> -- Asynchronous IO Support Rebooted: the "asyncio" Module
+              <ul>
+                <li class="fragment">codenamed Tulip, released in 3.4</li>
+                <li class="fragment">backported to python2 as Trollius (on pypi)</li>
+                <li class="fragment">since 3.5: <a href="https://www.python.org/dev/peps/pep-0492/">PEP 492</a> -- Coroutines with async and await syntax</li>
+              </ul>
+            </li>
+          </ul>
+          <blockquote class="fragment">
+            Interoperable with "legacy" async libraries by sharing / adapting event loops (with tornado, twisted, libevent..)
+          </blockquote>
+        </section>
+
+        <section>
+          <section>
+            <h2 style="text-transform:none">aiohttp</h2>
+            <ul>
+              <li>~6k lines of code, &gt;100 contributors since Oct. 2013</li>
+              <li class="fragment">built upon asyncio (Python &gt;=3.4 or Trollius for 2.7/PyPy)</li>
+              <li class="fragment">HTTP Server and Client</li>
+              <li class="fragment">WebSocket Server and Client</li>
+              <li class="fragment">simple, customizable routing (has traversal plug-in)</li>
+              <li class="fragment">middleware, event/signals, WSGI</li>
+              <li class="fragment">templates, sessions, authentication... are plug-ins</li>
+              <li class="fragment">ONE package dependency :)  "chardet"</li>
+            </ul>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2 style="text-transform:none">client example</h2>
+            <pre><code class="hljs" data-trim contenteditable>
+import aiohttp
+import asyncio
+
+urls = ["http://www.cnn.com", "http://espn.go.com/",
+    "http://grantland.com", "http://www.newyorker.com/"]
+
+async def get_url(url):
+    response = await aiohttp.request('GET', url)
+    print('%s: %s %s' % (url, response.status, response.reason))
+    response.close()
+
+tasks = [get_url(u) for u in urls]
+asyncio.get_event_loop().run_until_complete(asyncio.wait(tasks))
+            </code></pre>
+            <p>
+              <small><a href="http://gear11.com/2014/09/python-answer-to-goroutines/">http://gear11.com/2014/09/python-answer-to-goroutines/</a></small>
+            </p>
+          </section>
+          <section>
+            <h2 style="text-transform:none">Go equivalent</h2>
+            <pre><code class="hljs" style="max-height:none">package main
+
+import (
+    "fmt"
+    "net/http"
+    "sync"
+)
+
+func main() {
+    urls := []string{"http://www.cnn.com","http://espn.go.com/",
+        "http://grantland.com","http://www.newyorker.com/"}
+    var wg sync.WaitGroup
+    wg.Add(len(urls))
+    for _, url := range urls {
+        go func(url string) {
+            defer wg.Done()
+            response, err := http.Get(url)
+            if err != nil {
+                // error handling
+            }
+            fmt.Printf("%s: %s\n",url,response.Status)
+        }(url)
+    }
+    wg.Wait() // waits until the url checks complete
+}</code></pre>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h3>asyncio resources</h3>
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                    <ul>
+                      <li>aioamqp (RabbitMQ)</li>
+                      <li>aiodns</li>
+                      <li>aiodocker</li>
+                      <li>aioes (ElasticSearch)</li>
+                      <li>aiogevent</li>
+                      <li>aiohttp_debugtoolbar</li>
+                      <li>aiohttp-wsgi</li>
+                    </ul>
+                  </td>
+                  <td>
+                    <ul>
+                      <li>aiomemcache</li>
+                      <li>aiopg (Postgres/SQLAlchemy)</li>
+                      <li>aiozmq (ZeroMQ)</li>
+                      <li>asyncio-mongo</li>
+                      <li>asyncio-redis</li>
+                      <li>obelus (Asterisk)</li>
+                      <li>quamash (QT)</li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+            see <a href="https://github.com/aio-libs/">github.com/aio-libs</a> and <a href="http://asyncio.org">asyncio.org</a> for more
+            </p>
+          </section>
+        </section>
+
+        <section>
+          <h2 style="text-transform:none">server example</h2>
+          <pre><code class="hljs" data-trim contenteditable>
+import asyncio
+from aiohttp import web
+
+async def hello(request):
+    name = request.match_info['name']
+    return web.Response(text='Hello %s' % name)
+
+app = web.Application()
+app.router.add_route('GET', '/hello/{name}', hello)
+          </code></pre>
+        </section>
+
+        <section>
+          <h2 style="text-transform:none">server boilerplate</h2>
+          <pre><code class="hljs" data-trim contenteditable>
+loop = asyncio.get_event_loop()
+handler = app.make_handler()
+f = loop.create_server(app.make_handler(), '0.0.0.0', '8000')
+srv = loop.run_until_complete(f)
+print('serving on', srv.sockets[0].getsockname())
+
+try:
+    loop.run_forever()
+except KeyboardInterrupt:
+    pass
+finally:
+    loop.run_until_complete(handler.finish_connection(1.0))
+    srv.close()
+    loop.run_until_complete(srv.wait_closed())
+    loop.run_until_complete(app.finish())
+loop.close()
+          </code></pre>
+        </section>
+
+        <section>
+          <h4>Recommended readings</h4>
+          <img height="280" data-src="./images/enterprise-integration-patterns.gif">
+          <img height="280" data-src="./images/service-design-patterns.jpg">
+          <img height="280" data-src="./images/building-microservices.jpg">
+          <img height="280" data-src="./images/restful-web-apis.jpg">
+          <img height="280" data-src="./images/the-practice-of.jpg">
+          <img height="280" data-src="./images/fluent-python.jpg">
+        </section>
+
+      </div>
+
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: 'plugin/zoom-js/zoom.js', async: true },
+          { src: 'plugin/notes/notes.js', async: true }
+        ]
+      });
+
+    </script>
+
+  </body>
+</html>
